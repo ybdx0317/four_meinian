@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.meinian.mapper.PermissionMapper">
+
+    <!--Set<Permission> findPermissionsByRoleId(@Param("roleId") Integer roleId);-->
+    <select id="findPermissionsByRoleId" resultType="Permission">
+        SELECT t_permission.* FROM t_role_permission
+        LEFT JOIN t_permission
+        ON t_role_permission.permission_id = t_permission.id
+        WHERE t_role_permission.role_id = #{roleId}
+    </select>
+
+</mapper>

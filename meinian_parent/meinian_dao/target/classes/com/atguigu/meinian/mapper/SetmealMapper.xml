@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.meinian.mapper.SetmealMapper">
+
+    <!--void addSetmeal(Setmeal setmeal);-->
+    <insert id="addSetmeal" useGeneratedKeys="true" keyProperty="id">
+        insert into t_setmeal values
+        (
+            null,
+            #{name},
+            #{code},
+            #{helpCode},
+            #{sex},
+            #{age},
+            #{price},
+            #{remark},
+            #{attention},
+            #{img}
+        )
+    </insert>
+
+    <!--void addSetmealAndTravelGroup(@Param("setmealId") Integer id, @Param("travelGroupIds") Integer[] travelGroupIds);-->
+    <insert id="addSetmealAndTravelGroup">
+        insert into t_setmeal_travelgroup values 
+        <foreach collection="travelGroupIds" item="travelGroupId" separator=",">
+            (#{setmealId},#{travelGroupId})
+        </foreach>
+    </insert>
+
+    <!--Page<Setmeal> findPage(@Param("queryString") String queryString);-->
+    <select id="findPage" resultType="Setmeal">
+        select * from t_setmeal 
+        <where>
+            <if test="queryString != null and queryString != ''">
+                code = #{queryString} or helpCode = #{queryString} or name like "%"#{queryString}"%"
+            </if>
+        </where>
+    </select>
+
+<!--    void deleteTravelGroupAndItem(@Param("id") Integer id);-->
+    <delete id="deleteTravelGroupAndItem">
+        delete from t_setmeal_travelgroup where setmeal_id = #{id}
+    </delete>
+
+
+<!--    void deleteTravelGroup(@Param("id") Integer id);-->
+    <delete id="deleteTravelGroup">
+        delete from t_setmeal where id = #{id}
+    </delete>
+
+<!--    String getByImg(@Param("id") Integer id);-->
+    <select id="getByImg" resultType="string">
+        select img from t_setmeal where id = #{id}
+    </select>
+
+
+    <!--List<Integer> findTravelItemIdsByTravelGroupId(@Param("id") Integer id);-->
+    <select id="findTravelItemIdsByTravelGroupId" resultType="int">
+        select travelgroup_id from t_setmeal_travelgroup where setmeal_id = #{id}
+    </select>
+
+
+<!--    void updateSetmeal(Setmeal setmeal);-->
+    <update id="updateSetmeal">
+        update t_setmeal set
+            name=#{name},
+            code=#{code},
+            helpCode=#{helpCode},
+            sex=#{sex},
+            age=#{age},
+            price=#{price},
+            remark=#{remark},
+            attention=#{attention},
+            img=#{img}
+            where id = #{id}
+    </update>
+
+<!--        void add2s(@Param("setmealId") Integer id,@Param("travelGroupIds") Integer[] travelGroupIds);
+--><insert id="add2s">
+    insert into t_setmeal_travelgroup values
+    <foreach collection="travelGroupIds" item="travelGroupId" separator=",">
+        (#{setmealId},#{travelGroupId})
+    </foreach>
+</insert>
+
+
+<!--    List<Setmeal> findAll();-->
+    <select id="findAll" resultType="Setmeal">
+        select * from t_setmeal
+    </select>
+
+
+    <resultMap id="setmealResultMap" type="Setmeal">
+        <id property="id" column="id"></id>
+        <result property="name" column="name"></result>
+        <result property="code" column="code"></result>
+        <result property="helpCode" column="helpCode"></result>
+        <result property="sex" column="sex"></result>
+        <result property="age" column="age"></result>
+        <result property="price" column="price"></result>
+        <result property="remark" column="remark"></result>
+        <result property="attention" column="attention"></result>
+        <result property="img" column="img"></result>
+        <collection property="travelGroups"
+                    select="com.atguigu.meinian.mapper.TravelGroupMapper.findTravelGroupBySetmealId"
+                    column="id"></collection>
+    </resultMap>
+
+    <!--Setmeal findSetmealDetailById(@Param("id") Integer id);-->
+    <select id="findSetmealDetailById" resultMap="setmealResultMap">
+        select * from t_setmeal where id = #{id}
+    </select>
+
+    <!--List<Map> getSetmealReport();-->
+    <select id="getSetmealReport" resultType="map">
+        SELECT t_setmeal.name name,COUNT(*) value FROM t_order,t_setmeal
+        WHERE t_order.setmeal_id = t_setmeal.id
+        GROUP BY t_setmeal.name
+    </select>
+
+
+
+
+</mapper>

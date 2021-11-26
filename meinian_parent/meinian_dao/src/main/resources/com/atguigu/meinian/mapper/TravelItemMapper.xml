@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.meinian.mapper.TravelItemMapper">
+
+    <!--void add(TravelItem travelItem);-->
+    <insert id="add">
+        insert into t_travelitem values
+        (
+            null,#{code},#{name},#{sex},#{age},#{price},#{type},#{remark},#{attention}
+        )
+    </insert>
+
+    <!--Page<Object> findPage(@Param("queryString") String queryString);-->
+    <select id="findPage" resultType="TravelItem">
+        select * from t_travelitem
+        <where>
+            <if test="queryString != null and queryString != ''">
+                code = #{queryString} or name like concat('%',#{queryString},'%')
+            </if>
+        </where>
+    </select>
+
+    <!--void delete(@Param("id") Integer id);-->
+    <delete id="delete">
+        delete from t_travelitem where id = #{id}
+    </delete>
+
+    <!--TravelItem findById(@Param("id") Integer id);-->
+    <select id="findById" resultType="TravelItem">
+        select * from t_travelitem where id = #{id}
+    </select>
+
+    <!--void update(TravelItem travelItem);-->
+    <update id="update">
+        update t_travelitem set
+        code=#{code},
+        name=#{name},
+        sex=#{sex},
+        age=#{age},
+        price=#{price},
+        type=#{type},
+        remark=#{remark},
+        attention=#{attention}
+        where id = #{id}
+    </update>
+
+    <!--List<TravelItem> findAll();-->
+    <select id="findAll" resultType="TravelItem">
+        select * from t_travelitem
+    </select>
+
+
+    <!--List<TravelItem> findTravelItemByTravelGroupId(@Param("travelGroupId") Integer travelGroupId);-->
+    <select id="findTravelItemByTravelGroupId" resultType="TravelItem">
+        SELECT tb2.* FROM t_travelgroup_travelitem tb1
+        LEFT JOIN t_travelitem tb2
+        ON tb1.travelitem_id = tb2.id
+        WHERE tb1.travelgroup_id = #{travelGroupId}
+    </select>
+
+
+</mapper>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.meinian.mapper.OrderSettingMapper">
+
+    <!--int getCountByOrderDate(OrderSetting orderSetting);-->
+    <select id="getCountByOrderDate" resultType="int">
+        select count(*) from t_ordersetting where orderDate = #{orderDate}
+    </select>
+
+    <!--void updateOrderSettingByOrderDate(OrderSetting orderSetting);-->
+    <update id="updateOrderSettingByOrderDate">
+        update t_ordersetting set number = #{number} where orderDate = #{orderDate}
+    </update>
+
+    <!--void addOrderSetting(OrderSetting orderSetting);-->
+    <insert id="addOrderSetting">
+        insert into t_ordersetting values(null,#{orderDate},#{number},#{reservations})
+    </insert>
+
+    <!--List<OrderSetting> getOrderSettingByDate(@Param("dateBegin") String dateBegin, @Param("dateEnd") String dateEnd);-->
+    <select id="getOrderSettingByDate" resultType="OrderSetting">
+        select * from t_ordersetting where orderDate between #{dateBegin} and #{dateEnd}
+    </select>
+
+    <!--OrderSetting findOrderSettingByOrderDate(@Param("orderDate") Date orderDate);-->
+    <select id="findOrderSettingByOrderDate" resultType="OrderSetting">
+        select * from t_ordersetting where orderDate = #{orderDate}
+    </select>
+
+    <!--void updateReservationsByOrderDate(OrderSetting orderSetting);-->
+    <update id="updateReservationsByOrderDate">
+        update t_ordersetting set reservations = #{reservations} where orderDate = #{orderDate}
+    </update>
+
+
+
+</mapper>

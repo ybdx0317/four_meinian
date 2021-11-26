@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:component-scan base-package="com.atguigu"></context:component-scan>
+    
+    <!--
+            security="none"：不需要认证和任何的权限就可以访问资源
+        -->
+    <security:http security="none" pattern="/js/**" />
+    <security:http security="none" pattern="/css/**" />
+    <security:http security="none" pattern="/login.html" />
+
+
+<!--
+    auto-config="true":开启自动配置 由springsecurity提供登录页面，提供登录的url地址，退出的url地址
+    use-expressions="true"：使用表达式的方式控制权限
+    security:intercept-url：定义哪些链接不可以放行，需要当前角色和权限才能放行
+        pattern="/**"：要求系统中的所有资源，都必须通过角色和权限才能访问
+        access：指定角色和权限
+        access="hasRole('ROLE_ADMIN')：表示具有ROLE_ADMIN的角色才能访问系统的资源
+
+-->
+    <security:http auto-config="true" use-expressions="true">
+        <!--a.html必须认证（登录）之后才能访问-->
+        <security:intercept-url pattern="/a.html" access="isAuthenticated()"></security:intercept-url>
+        <!--b.html必须拥有ROLE_ADMIN角色才能访问-->
+        <security:intercept-url pattern="/b.html" access="hasRole('ROLE_ADMIN')"></security:intercept-url>
+        <!--c.html必须拥有delete权限才能访问-->
+        <security:intercept-url pattern="/c.html" access="hasAuthority('delete')"></security:intercept-url>
+        <!--d.html必须拥有query权限才能访问-->
+        <security:intercept-url pattern="/d.html" access="hasAuthority('query')"></security:intercept-url>
+<!--所有都要通过角色访问-->
+<!--        <security:intercept-url pattern="/**" access="hasRole('ROLE_ADMIN')"></security:intercept-url>-->
+        <security:form-login login-page="/login.html"
+                             username-parameter="username"
+                             password-parameter="password"
+                             login-processing-url="/login.do"
+                             default-target-url="/index.html"
+                             authentication-failure-url="/login.html"
+                             always-use-default-target="true"/>
+        <!--
+            csrf：对应CsrfFilter过滤器
+            disabled：是否启用CsrfFilter过滤器，如果使用自定义登录页面需要关闭此项，否则登录操作会被禁用（403）
+        -->
+        <security:csrf disabled="true"></security:csrf>
+
+<!--        退出登录  logout-url：退出登录操作对应的请求路径   logout-success-url：退出登录后的跳转页面-->
+        <security:logout logout-url="/logout.do" logout-success-url="/login.html" invalidate-session="true"></security:logout>
+    </security:http>
+
+<!--    开启通过注解来管理控制-->
+    <security:global-method-security pre-post-annotations="enabled"></security:global-method-security>
+
+    <security:authentication-manager>
+        <!-- authentication-provider：认证提供者，执行具体的认证逻辑 -->
+        <security:authentication-provider user-service-ref="userService">
+            <!--<security:user-service>
+                &lt;!&ndash;不加密
+    认证管理：定义登录账号和密码，并授予当前用户访问的角色或权限
+    security:user name="admin" :登录名
+    authorities="ROLE_ADMIN"   ：角色(ROLE_ADMIN),权限
+    password="admin"          ：密码
+    &ndash;&gt;
+                <security:user name="admin" authorities="ROLE_ADMIN" password="{noop}admin"></security:user>
+            </security:user-service>-->
+<!--            引入密码的加密工具-->
+            <security:password-encoder ref="passwordEncoder"></security:password-encoder>
+        </security:authentication-provider>
+    </security:authentication-manager>
+
+<!--    加密工具-->
+    <bean id="passwordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"></bean>
+
+</beans>
